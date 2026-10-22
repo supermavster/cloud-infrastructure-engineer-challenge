@@ -34,8 +34,14 @@ repos:
       - id: terraform_tflint
         args: [--args=--config=__GIT_WORKING_DIR__/.tflint.hcl]
         stages: [manual]
-      - id: terraform_checkov
-        args: [--args=--config-file=__GIT_WORKING_DIR__/.checkov.yaml]
+
+  - repo: local
+    hooks:
+      - id: checkov
+        name: checkov (make scan)
+        entry: make scan
+        language: system
+        pass_filenames: false
         stages: [manual]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit

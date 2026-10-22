@@ -5,9 +5,10 @@ SHELL := /usr/bin/env bash
 ENV ?= dev
 TF_ROOTS := terraform
 TF := terraform -chdir=terraform
+CHECKOV_VERSION := 3.3.30
 ENV_DIR := terraform/environments/$(ENV)
 
-.PHONY: help init fmt fmt-check validate lint
+.PHONY: help init fmt fmt-check validate lint scan
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-12s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -33,3 +34,6 @@ validate: ## Validate every Terraform root without touching a backend
 lint: ## Run tflint on every module
 	tflint --init --config=$(CURDIR)/.tflint.hcl
 	tflint --recursive --config=$(CURDIR)/.tflint.hcl
+
+scan: ## Run checkov security checks (pinned version, no install needed)
+	uvx --from checkov==$(CHECKOV_VERSION) checkov --config-file .checkov.yaml
