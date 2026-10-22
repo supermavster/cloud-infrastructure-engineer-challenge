@@ -128,3 +128,15 @@ variable "db_apply_immediately" {
   type        = bool
   default     = false
 }
+
+variable "lambda_package_dir" {
+  description = "Directory holding the built Lambda package. Created by make build."
+  type        = string
+  default     = "../build/functions/info"
+}
+
+variable "lambda_reserved_concurrency" {
+  description = "Cap on concurrent Lambda executions, which also caps database connections. -1 leaves it unreserved; accounts with a low concurrency quota cannot reserve any."
+  type        = number
+  default     = -1
+}

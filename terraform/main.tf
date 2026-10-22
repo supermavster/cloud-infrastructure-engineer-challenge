@@ -56,3 +56,46 @@ module "database" {
   apply_immediately     = var.db_apply_immediately
   log_retention_days    = var.log_retention_days
 }
+
+module "lambda" {
+  source = "./modules/lambda"
+
+  name                           = "${local.name_prefix}-info"
+  source_dir                     = var.lambda_package_dir
+  subnet_ids                     = module.network.app_subnet_ids
+  security_group_id              = module.security.lambda_security_group_id
+  reserved_concurrent_executions = var.lambda_reserved_concurrency
+  log_retention_days             = var.log_retention_days
+  log_kms_key_arn                = module.kms.key_arns["observability"]
+
+  environment = {
+    DB_HOST        = module.database.address
+    DB_PORT        = tostring(module.database.port)
+    DB_NAME        = module.database.database_name
+    DB_SECRET_ARN  = module.database.master_secret_arn
+    DB_INSTANCE_ID = module.database.identifier
+  }
+
+  policy_statements = [
+    {
+      sid       = "ReadDatabaseSecret"
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [module.database.master_secret_arn]
+    },
+    {
+      sid       = "DecryptDatabaseSecret"
+      actions   = ["kms:Decrypt"]
+      resources = [module.kms.key_arns["data"]]
+      conditions = [{
+        test     = "StringEquals"
+        variable = "kms:ViaService"
+        values   = ["secretsmanager.${var.region}.amazonaws.com"]
+      }]
+    },
+    {
+      sid       = "DescribeDatabaseInstance"
+      actions   = ["rds:DescribeDBInstances"]
+      resources = [module.database.arn]
+    },
+  ]
+}

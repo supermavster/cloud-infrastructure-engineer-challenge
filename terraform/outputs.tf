@@ -22,3 +22,13 @@ output "database_identifier" {
   description = "RDS instance identifier. Use it with the RDS and CloudWatch APIs."
   value       = module.database.identifier
 }
+
+output "lambda_function_name" {
+  description = "Name of the Lambda function."
+  value       = module.lambda.function_name
+}
+
+output "lambda_log_group_name" {
+  description = "CloudWatch log group the Lambda writes to."
+  value       = module.lambda.log_group_name
+}

@@ -30,6 +30,7 @@ top-level README for the full deployment steps.
 | ---- | ------ | ------- |
 | <a name="module_database"></a> [database](#module\_database) | ./modules/database | n/a |
 | <a name="module_kms"></a> [kms](#module\_kms) | ./modules/kms | n/a |
+| <a name="module_lambda"></a> [lambda](#module\_lambda) | ./modules/lambda | n/a |
 | <a name="module_network"></a> [network](#module\_network) | ./modules/network | n/a |
 | <a name="module_security"></a> [security](#module\_security) | ./modules/security | n/a |
 
@@ -60,6 +61,8 @@ top-level README for the full deployment steps.
 | <a name="input_db_max_allocated_storage"></a> [db\_max\_allocated\_storage](#input\_db\_max\_allocated\_storage) | Ceiling in GiB that database storage grows to automatically. | `number` | `50` | no |
 | <a name="input_db_skip_final_snapshot"></a> [db\_skip\_final\_snapshot](#input\_db\_skip\_final\_snapshot) | Skip the snapshot taken when the database is deleted. Leave false anywhere data matters. | `bool` | `false` | no |
 | <a name="input_kms_deletion_window_in_days"></a> [kms\_deletion\_window\_in\_days](#input\_kms\_deletion\_window\_in\_days) | Days a KMS key stays recoverable after deletion is scheduled (7-30). | `number` | `30` | no |
+| <a name="input_lambda_package_dir"></a> [lambda\_package\_dir](#input\_lambda\_package\_dir) | Directory holding the built Lambda package. Created by make build. | `string` | `"../build/functions/info"` | no |
+| <a name="input_lambda_reserved_concurrency"></a> [lambda\_reserved\_concurrency](#input\_lambda\_reserved\_concurrency) | Cap on concurrent Lambda executions, which also caps database connections. -1 leaves it unreserved; accounts with a low concurrency quota cannot reserve any. | `number` | `-1` | no |
 | <a name="input_project"></a> [project](#input\_project) | Short project name used as the prefix of every resource name. | `string` | `"info-api"` | no |
 | <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | IPv4 CIDR of the VPC. Subnets are /24 blocks carved from it, so use /16 or larger. | `string` | `"10.20.0.0/16"` | no |
 
@@ -69,6 +72,8 @@ top-level README for the full deployment steps.
 | ---- | ----------- |
 | <a name="output_account_id"></a> [account\_id](#output\_account\_id) | AWS account this configuration is applied to. Check it before approving a plan. |
 | <a name="output_database_identifier"></a> [database\_identifier](#output\_database\_identifier) | RDS instance identifier. Use it with the RDS and CloudWatch APIs. |
+| <a name="output_lambda_function_name"></a> [lambda\_function\_name](#output\_lambda\_function\_name) | Name of the Lambda function. |
+| <a name="output_lambda_log_group_name"></a> [lambda\_log\_group\_name](#output\_lambda\_log\_group\_name) | CloudWatch log group the Lambda writes to. |
 | <a name="output_nat_public_ips"></a> [nat\_public\_ips](#output\_nat\_public\_ips) | Public IPs of the NAT gateways. Allow-list these at any service the Lambda calls over the internet. |
 | <a name="output_region"></a> [region](#output\_region) | AWS region this configuration is applied to. |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | ID of the VPC. |
