@@ -1,5 +1,5 @@
 resource "aws_security_group" "lambda" {
-  # checkov:skip=CKV2_AWS_5: attached in the lambda module through the output of this one
+  # checkov:skip=CKV2_AWS_5: attached in the lambda module; checkov cannot follow module outputs
   name        = "${var.name}-lambda"
   description = "Lambda function network interfaces"
   vpc_id      = var.vpc_id
@@ -10,7 +10,7 @@ resource "aws_security_group" "lambda" {
 }
 
 resource "aws_security_group" "database" {
-  # checkov:skip=CKV2_AWS_5: attached in the database module through the output of this one
+  # checkov:skip=CKV2_AWS_5: attached in the database module; checkov cannot follow module outputs
   name        = "${var.name}-database"
   description = "PostgreSQL database"
   vpc_id      = var.vpc_id

@@ -17,3 +17,8 @@ output "nat_public_ips" {
   description = "Public IPs of the NAT gateways. Allow-list these at any service the Lambda calls over the internet."
   value       = module.network.nat_public_ips
 }
+
+output "database_identifier" {
+  description = "RDS instance identifier. Use it with the RDS and CloudWatch APIs."
+  value       = module.database.identifier
+}
