@@ -17,3 +17,14 @@ module "kms" {
     }
   }
 }
+
+module "network" {
+  source = "./modules/network"
+
+  name                    = local.name_prefix
+  cidr_block              = var.vpc_cidr_block
+  az_count                = var.az_count
+  nat_gateway_mode        = var.nat_gateway_mode
+  flow_log_retention_days = var.flow_log_retention_days
+  log_kms_key_arn         = module.kms.key_arns["observability"]
+}
