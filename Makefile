@@ -9,9 +9,11 @@ TF := terraform -chdir=terraform
 BOOTSTRAP := terraform -chdir=terraform/bootstrap
 REGION ?= us-east-1
 CHECKOV_VERSION := 3.3.30
+FUNCTION_DIR := functions/info
+BUILD_DIR := build/functions/info
 ENV_DIR := terraform/environments/$(ENV)
 
-.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test
+.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test function-lint function-test build check
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -61,3 +63,19 @@ test: ## Run terraform test (mocked AWS provider, no credentials needed)
 		terraform -chdir=$$dir init -backend=false -input=false >/dev/null; \
 		terraform -chdir=$$dir test; \
 	done
+
+function-lint: ## Lint and format-check the Lambda function
+	cd $(FUNCTION_DIR) && uv run ruff check . && uv run ruff format --check .
+
+function-test: ## Run the Lambda unit tests (no database needed)
+	cd $(FUNCTION_DIR) && uv run pytest -m "not integration"
+
+build: ## Package the Lambda function into build/ (locked, hash-verified, linux arm64)
+	rm -rf build
+	mkdir -p $(BUILD_DIR)
+	cd $(FUNCTION_DIR) && uv export --frozen --no-dev --no-emit-project -o $(CURDIR)/build/requirements.txt
+	uv pip install --quiet --target $(BUILD_DIR) --python-platform aarch64-manylinux2014 --python-version 3.13 --require-hashes --no-deps -r build/requirements.txt
+	cp -R $(FUNCTION_DIR)/src/info_api $(BUILD_DIR)/
+	find $(BUILD_DIR) -name __pycache__ -type d -prune -exec rm -rf {} +
+
+check: fmt-check validate lint scan test function-lint function-test ## Everything that needs no database or AWS account
