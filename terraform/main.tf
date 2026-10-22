@@ -28,3 +28,11 @@ module "network" {
   flow_log_retention_days = var.flow_log_retention_days
   log_kms_key_arn         = module.kms.key_arns["observability"]
 }
+
+module "security" {
+  source = "./modules/security"
+
+  name    = local.name_prefix
+  vpc_id  = module.network.vpc_id
+  db_port = local.db_port
+}

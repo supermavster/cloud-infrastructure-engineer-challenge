@@ -30,6 +30,7 @@ top-level README for the full deployment steps.
 | ---- | ------ | ------- |
 | <a name="module_kms"></a> [kms](#module\_kms) | ./modules/kms | n/a |
 | <a name="module_network"></a> [network](#module\_network) | ./modules/network | n/a |
+| <a name="module_security"></a> [security](#module\_security) | ./modules/security | n/a |
 
 ## Resources
 
