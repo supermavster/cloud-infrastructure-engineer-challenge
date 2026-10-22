@@ -27,7 +27,9 @@ repos:
     hooks:
       - id: terraform_fmt
       - id: terraform_docs
-        args: [--args=--config=.terraform-docs.yml]
+        args:
+          - --hook-config=--create-file-if-not-exist=true
+          - --args=--config=.terraform-docs.yml
       - id: terraform_validate
         args: [--hook-config=--retry-once-with-cleanup=true]
         stages: [manual]
