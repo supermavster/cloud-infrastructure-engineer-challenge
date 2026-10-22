@@ -13,6 +13,9 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# Only the two roots pin providers; modules inherit the root's selection.
+terraform/modules/**/.terraform.lock.hcl
+
 # Backend settings are per-account; only the *.example templates are tracked.
 backend.hcl
 

@@ -4,6 +4,7 @@ SHELL := /usr/bin/env bash
 
 ENV ?= dev
 TF_ROOTS := terraform terraform/bootstrap
+TF_TEST_DIRS := $(TF_ROOTS) $(wildcard terraform/modules/*)
 TF := terraform -chdir=terraform
 BOOTSTRAP := terraform -chdir=terraform/bootstrap
 REGION ?= us-east-1
@@ -55,7 +56,7 @@ scan: ## Run checkov security checks (pinned version, no install needed)
 	uvx --from checkov==$(CHECKOV_VERSION) checkov --config-file .checkov.yaml
 
 test: ## Run terraform test (mocked AWS provider, no credentials needed)
-	@for dir in $(TF_ROOTS); do \
+	@for dir in $(TF_TEST_DIRS); do \
 		echo "test $$dir"; \
 		terraform -chdir=$$dir init -backend=false -input=false >/dev/null; \
 		terraform -chdir=$$dir test; \

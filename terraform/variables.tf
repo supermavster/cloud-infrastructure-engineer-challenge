@@ -44,3 +44,14 @@ variable "allowed_account_ids" {
     error_message = "Each account ID must be exactly 12 digits."
   }
 }
+
+variable "kms_deletion_window_in_days" {
+  description = "Days a KMS key stays recoverable after deletion is scheduled (7-30)."
+  type        = number
+  default     = 30
+
+  validation {
+    condition     = var.kms_deletion_window_in_days >= 7 && var.kms_deletion_window_in_days <= 30
+    error_message = "kms_deletion_window_in_days must be between 7 and 30."
+  }
+}
