@@ -140,3 +140,19 @@ variable "lambda_reserved_concurrency" {
   type        = number
   default     = -1
 }
+
+variable "lambda_timeout_seconds" {
+  description = "Lambda timeout. API Gateway waits one second longer, so callers see the function's own error rather than a gateway timeout."
+  type        = number
+  default     = 15
+}
+
+variable "api_throttling_rate_limit" {
+  description = "Requests per second the API accepts. Excess requests get HTTP 429 before they reach the database."
+  type        = number
+}
+
+variable "api_throttling_burst_limit" {
+  description = "Short burst of requests the API accepts above the steady rate."
+  type        = number
+}

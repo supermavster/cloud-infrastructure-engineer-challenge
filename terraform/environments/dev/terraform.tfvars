@@ -17,5 +17,10 @@ db_skip_final_snapshot   = true
 db_apply_immediately     = true
 log_retention_days       = 7
 
+# Low limits protect a small database: at 5 requests/s a 5 s database stall
+# means about 25 concurrent connections, well under its limit.
+api_throttling_rate_limit  = 5
+api_throttling_burst_limit = 10
+
 # Set to your account ID so a wrong AWS profile fails fast:
 # allowed_account_ids = ["<AWS_ACCOUNT_ID>"]

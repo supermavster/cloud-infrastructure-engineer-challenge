@@ -28,6 +28,7 @@ top-level README for the full deployment steps.
 
 | Name | Source | Version |
 | ---- | ------ | ------- |
+| <a name="module_api"></a> [api](#module\_api) | ./modules/api | n/a |
 | <a name="module_database"></a> [database](#module\_database) | ./modules/database | n/a |
 | <a name="module_kms"></a> [kms](#module\_kms) | ./modules/kms | n/a |
 | <a name="module_lambda"></a> [lambda](#module\_lambda) | ./modules/lambda | n/a |
@@ -44,6 +45,8 @@ top-level README for the full deployment steps.
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_api_throttling_burst_limit"></a> [api\_throttling\_burst\_limit](#input\_api\_throttling\_burst\_limit) | Short burst of requests the API accepts above the steady rate. | `number` | n/a | yes |
+| <a name="input_api_throttling_rate_limit"></a> [api\_throttling\_rate\_limit](#input\_api\_throttling\_rate\_limit) | Requests per second the API accepts. Excess requests get HTTP 429 before they reach the database. | `number` | n/a | yes |
 | <a name="input_db_backup_retention_days"></a> [db\_backup\_retention\_days](#input\_db\_backup\_retention\_days) | Days to keep automated database backups (1-35). Sets the point-in-time restore window. | `number` | n/a | yes |
 | <a name="input_db_multi_az"></a> [db\_multi\_az](#input\_db\_multi\_az) | Run a synchronous standby in a second zone with automatic failover. | `bool` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | Deployment environment. Selects the settings profile in environments/<env>/. | `string` | n/a | yes |
@@ -63,6 +66,7 @@ top-level README for the full deployment steps.
 | <a name="input_kms_deletion_window_in_days"></a> [kms\_deletion\_window\_in\_days](#input\_kms\_deletion\_window\_in\_days) | Days a KMS key stays recoverable after deletion is scheduled (7-30). | `number` | `30` | no |
 | <a name="input_lambda_package_dir"></a> [lambda\_package\_dir](#input\_lambda\_package\_dir) | Directory holding the built Lambda package. Created by make build. | `string` | `"../build/functions/info"` | no |
 | <a name="input_lambda_reserved_concurrency"></a> [lambda\_reserved\_concurrency](#input\_lambda\_reserved\_concurrency) | Cap on concurrent Lambda executions, which also caps database connections. -1 leaves it unreserved; accounts with a low concurrency quota cannot reserve any. | `number` | `-1` | no |
+| <a name="input_lambda_timeout_seconds"></a> [lambda\_timeout\_seconds](#input\_lambda\_timeout\_seconds) | Lambda timeout. API Gateway waits one second longer, so callers see the function's own error rather than a gateway timeout. | `number` | `15` | no |
 | <a name="input_project"></a> [project](#input\_project) | Short project name used as the prefix of every resource name. | `string` | `"info-api"` | no |
 | <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | IPv4 CIDR of the VPC. Subnets are /24 blocks carved from it, so use /16 or larger. | `string` | `"10.20.0.0/16"` | no |
 
@@ -71,7 +75,9 @@ top-level README for the full deployment steps.
 | Name | Description |
 | ---- | ----------- |
 | <a name="output_account_id"></a> [account\_id](#output\_account\_id) | AWS account this configuration is applied to. Check it before approving a plan. |
+| <a name="output_api_access_log_group_name"></a> [api\_access\_log\_group\_name](#output\_api\_access\_log\_group\_name) | CloudWatch log group that receives the API access logs. |
 | <a name="output_database_identifier"></a> [database\_identifier](#output\_database\_identifier) | RDS instance identifier. Use it with the RDS and CloudWatch APIs. |
+| <a name="output_info_url"></a> [info\_url](#output\_info\_url) | URL of GET /info. |
 | <a name="output_lambda_function_name"></a> [lambda\_function\_name](#output\_lambda\_function\_name) | Name of the Lambda function. |
 | <a name="output_lambda_log_group_name"></a> [lambda\_log\_group\_name](#output\_lambda\_log\_group\_name) | CloudWatch log group the Lambda writes to. |
 | <a name="output_nat_public_ips"></a> [nat\_public\_ips](#output\_nat\_public\_ips) | Public IPs of the NAT gateways. Allow-list these at any service the Lambda calls over the internet. |

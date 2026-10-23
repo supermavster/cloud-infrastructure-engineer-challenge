@@ -1,3 +1,8 @@
+output "info_url" {
+  description = "URL of GET /info."
+  value       = module.api.route_url
+}
+
 output "account_id" {
   description = "AWS account this configuration is applied to. Check it before approving a plan."
   value       = data.aws_caller_identity.current.account_id
@@ -31,4 +36,9 @@ output "lambda_function_name" {
 output "lambda_log_group_name" {
   description = "CloudWatch log group the Lambda writes to."
   value       = module.lambda.log_group_name
+}
+
+output "api_access_log_group_name" {
+  description = "CloudWatch log group that receives the API access logs."
+  value       = module.api.access_log_group_name
 }

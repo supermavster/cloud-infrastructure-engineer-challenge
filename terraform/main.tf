@@ -64,6 +64,7 @@ module "lambda" {
   source_dir                     = var.lambda_package_dir
   subnet_ids                     = module.network.app_subnet_ids
   security_group_id              = module.security.lambda_security_group_id
+  timeout                        = var.lambda_timeout_seconds
   reserved_concurrent_executions = var.lambda_reserved_concurrency
   log_retention_days             = var.log_retention_days
   log_kms_key_arn                = module.kms.key_arns["observability"]
@@ -98,4 +99,17 @@ module "lambda" {
       resources = [module.database.arn]
     },
   ]
+}
+
+module "api" {
+  source = "./modules/api"
+
+  name                   = "${local.name_prefix}-info"
+  lambda_function_name   = module.lambda.function_name
+  lambda_invoke_arn      = module.lambda.invoke_arn
+  integration_timeout_ms = (var.lambda_timeout_seconds + 1) * 1000
+  throttling_rate_limit  = var.api_throttling_rate_limit
+  throttling_burst_limit = var.api_throttling_burst_limit
+  log_retention_days     = var.log_retention_days
+  log_kms_key_arn        = module.kms.key_arns["observability"]
 }
