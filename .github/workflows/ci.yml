@@ -123,3 +123,6 @@ jobs:
           find-dir: terraform
           config-file: .terraform-docs.yml
           fail-on-diff: true
+      - name: Show what differs
+        if: failure()
+        run: git --no-pager diff HEAD
