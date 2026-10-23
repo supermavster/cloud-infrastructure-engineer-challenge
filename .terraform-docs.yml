@@ -7,8 +7,6 @@ sort:
 content: |-
   {{ .Requirements }}
 
-  {{ .Providers }}
-
   {{ .Modules }}
 
   {{ .Resources }}

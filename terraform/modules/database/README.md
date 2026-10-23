@@ -35,13 +35,6 @@ window.
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.70 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.9 |
 
-## Providers
-
-| Name | Version |
-| ---- | ------- |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.70.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.9.1 |
-
 ## Modules
 
 No modules.

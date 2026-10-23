@@ -32,13 +32,6 @@ The package zip is written to `.terraform/` of the root and is not committed.
 | <a name="requirement_archive"></a> [archive](#requirement\_archive) | ~> 2.8 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.70 |
 
-## Providers
-
-| Name | Version |
-| ---- | ------- |
-| <a name="provider_archive"></a> [archive](#provider\_archive) | 2.8.1 |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.70.0 |
-
 ## Modules
 
 No modules.
