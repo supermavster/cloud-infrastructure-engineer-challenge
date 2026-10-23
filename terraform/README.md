@@ -4,7 +4,7 @@ Root module. It only wires the modules in `modules/` together; resources live
 in the modules and per-environment values live in `environments/<env>/`.
 
 ```bash
-make init ENV=dev      # needs environments/dev/backend.hcl
+make init ENV=dev REGION=us-east-1   # connects to the shared state
 ```
 
 Run `make bootstrap-plan` first if the state bucket does not exist yet. See the

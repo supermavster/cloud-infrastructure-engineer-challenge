@@ -10,14 +10,23 @@ ENVS := dev prod
 TF := terraform -chdir=terraform
 BOOTSTRAP := terraform -chdir=terraform/bootstrap
 REGION ?= us-east-1
+# The state bucket defaults to the one the local bootstrap created. The GitHub
+# workflow sets STATE_BUCKET and STATE_REGION explicitly.
+STATE_BUCKET ?= $(shell $(BOOTSTRAP) output -raw bucket_name 2>/dev/null)
+STATE_REGION ?= $(or $(shell $(BOOTSTRAP) output -raw region 2>/dev/null),us-east-1)
+PLAN_FLAGS ?=
+LOCK_ID ?=
+CONFIRM ?=
 CHECKOV_VERSION := 3.3.30
 ACTIONLINT_VERSION := 1.7.12.25
 FUNCTION_DIR := functions/info
 BUILD_DIR := build/functions/info
 ENV_DIR := terraform/environments/$(ENV)
 TFVARS := environments/$(ENV)/terraform.tfvars
+TFARGS := -var-file=$(TFVARS) -var region=$(REGION)
+PLAN_FILE := $(ENV)-$(REGION).tfplan
 
-.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test function-lint function-test function-integration docs actionlint local-up local-down local-invoke build check plan apply destroy verify logs
+.PHONY: help bootstrap-plan bootstrap-apply check-env check-state check-plan init unlock fmt fmt-check validate lint scan test function-lint function-test function-integration docs actionlint local-up local-down local-invoke build check plan apply destroy verify logs
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -30,16 +39,28 @@ bootstrap-plan: ## Plan the state bucket (BUCKET=<globally unique name> [REGION=
 bootstrap-apply: ## Apply the plan saved by bootstrap-plan (review it first)
 	$(BOOTSTRAP) apply -input=false tfplan
 
-backend-config: ## Write backend.hcl for ENV from the bootstrap outputs
+check-env:
 	@test -d $(ENV_DIR) || { echo "unknown ENV '$(ENV)': $(ENV_DIR) does not exist"; exit 1; }
-	@printf 'bucket       = "%s"\nkey          = "info-api/%s/terraform.tfstate"\nregion       = "%s"\nencrypt      = true\nuse_lockfile = true\n' \
-		"$$($(BOOTSTRAP) output -raw bucket_name)" "$(ENV)" "$$($(BOOTSTRAP) output -raw region)" > $(ENV_DIR)/backend.hcl
-	@echo "wrote $(ENV_DIR)/backend.hcl"
 
-init: ## Initialise the remote backend for ENV (default: dev)
-	@test -d $(ENV_DIR) || { echo "unknown ENV '$(ENV)': $(ENV_DIR) does not exist"; exit 1; }
-	@test -f $(ENV_DIR)/backend.hcl || { echo "missing $(ENV_DIR)/backend.hcl: copy backend.hcl.example and fill it in"; exit 1; }
-	$(TF) init -input=false -reconfigure -backend-config=environments/$(ENV)/backend.hcl
+check-state:
+	@test -n "$(STATE_BUCKET)" || { echo "set STATE_BUCKET, or run make bootstrap-plan and bootstrap-apply to create the state bucket"; exit 1; }
+
+check-plan:
+	@test -f terraform/$(PLAN_FILE) || { echo "no saved plan for $(ENV) in $(REGION): run make plan first"; exit 1; }
+
+init: check-env check-state ## Connect to the shared state for ENV and REGION
+	$(TF) init -input=false -reconfigure \
+		-backend-config="bucket=$(STATE_BUCKET)" \
+		-backend-config="key=info-api/$(ENV)/$(REGION)/terraform.tfstate" \
+		-backend-config="region=$(STATE_REGION)" \
+		-backend-config="use_lockfile=true" \
+		-backend-config="encrypt=true"
+
+unlock: check-env ## Release a stuck state lock. Needs LOCK_ID and CONFIRM=<ENV>
+	@test -n "$(LOCK_ID)" || { echo "set LOCK_ID to the ID in the 'state is locked' error"; exit 1; }
+	@test "$(CONFIRM)" = "$(ENV)" || { echo "refusing to unlock: run make unlock ENV=$(ENV) CONFIRM=$(ENV) LOCK_ID=<id>"; exit 1; }
+	@$(MAKE) --no-print-directory init
+	$(TF) force-unlock -force $(LOCK_ID)
 
 fmt: ## Rewrite Terraform files to canonical format
 	terraform fmt -recursive terraform
@@ -109,22 +130,21 @@ build: ## Package the Lambda function into build/ (locked, hash-verified, linux 
 	cp -R $(FUNCTION_DIR)/src/info_api $(BUILD_DIR)/
 	find $(BUILD_DIR) -name __pycache__ -type d -prune -exec rm -rf {} +
 
-plan: build ## Plan ENV and save the plan to review (needs AWS credentials and make init)
-	@test -d $(ENV_DIR) || { echo "unknown ENV '$(ENV)': $(ENV_DIR) does not exist"; exit 1; }
-	$(TF) plan -input=false -lock-timeout=60s -var-file=$(TFVARS) -out=$(ENV).tfplan
+plan: build init ## Plan ENV in REGION and save the plan (PLAN_FLAGS=-destroy plans a destroy)
+	$(TF) plan -input=false -lock-timeout=60s $(TFARGS) $(PLAN_FLAGS) -out=$(PLAN_FILE)
 
-apply: ## Apply the plan saved by make plan, and nothing else
-	@test -f terraform/$(ENV).tfplan || { echo "no saved plan for '$(ENV)': run make plan ENV=$(ENV) and review it first"; exit 1; }
-	$(TF) apply -input=false -lock-timeout=60s $(ENV).tfplan
+apply: check-plan init ## Apply the plan saved by make plan, and nothing else
+	$(TF) apply -input=false -lock-timeout=60s $(PLAN_FILE)
 
-destroy: build ## Destroy ENV. Needs CONFIRM=yes, and Terraform still asks for confirmation
-	@test "$(CONFIRM)" = yes || { echo "refusing to destroy '$(ENV)': run make destroy ENV=$(ENV) CONFIRM=yes"; exit 1; }
-	$(TF) destroy -lock-timeout=60s -var-file=$(TFVARS)
+destroy: check-env ## Destroy ENV in REGION. Needs CONFIRM=<ENV>, and Terraform still asks
+	@test "$(CONFIRM)" = "$(ENV)" || { echo "refusing to destroy '$(ENV)': run make destroy ENV=$(ENV) CONFIRM=$(ENV)"; exit 1; }
+	@$(MAKE) --no-print-directory build init
+	$(TF) destroy -lock-timeout=60s $(TFARGS)
 
-verify: ## Call the deployed endpoint and print the response
+verify: init ## Call the deployed endpoint and print the response
 	curl -sS --fail-with-body "$$($(TF) output -raw info_url)" | jq .
 
-logs: ## Tail the Lambda's CloudWatch logs (needs the AWS CLI)
-	aws logs tail "/aws/lambda/$$($(TF) output -raw lambda_function_name)" --since 15m --follow
+logs: init ## Tail the Lambda's CloudWatch logs (needs the AWS CLI)
+	aws logs tail "/aws/lambda/$$($(TF) output -raw lambda_function_name)" --region $(REGION) --since 15m --follow
 
 check: fmt-check validate lint actionlint scan test function-lint function-test ## Everything that needs no database or AWS account

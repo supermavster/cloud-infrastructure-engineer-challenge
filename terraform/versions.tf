@@ -8,7 +8,7 @@ terraform {
     }
   }
 
-  # Bucket, key and region are supplied at init time from
-  # environments/<env>/backend.hcl so this code has no account-specific values.
+  # Bucket, key and region are supplied at init time (make init, or the deploy
+  # workflow), so this code holds no account-specific value.
   backend "s3" {}
 }

@@ -92,25 +92,27 @@ the AWS CLI for `make logs`.
 # 1. Remote state: a bucket with versioning, encryption and no public access.
 #    The name must be globally unique. Review the plan, then apply it.
 make bootstrap-plan BUCKET=<globally-unique-name>
-make bootstrap-apply
-make backend-config ENV=dev          # writes terraform/environments/dev/backend.hcl
+make bootstrap-apply                 # from here on make finds the bucket by itself
 
 # 2. Optional: edit terraform/environments/dev/terraform.tfvars
 #    - allowed_account_ids = ["<AWS_ACCOUNT_ID>"]   stops a wrong profile
 #    - alert_email         = "you@example.com"      confirm the email AWS sends
 
-# 3. Initialise, plan, review, apply.
-make init ENV=dev
-make plan ENV=dev                    # builds the Lambda package, saves dev.tfplan
-make apply ENV=dev                   # applies exactly that plan
+# 3. Plan, review, apply. ENV is dev or prod; REGION defaults to us-east-1.
+make plan ENV=dev REGION=us-east-1   # connects to the shared state, builds, saves the plan
+make apply ENV=dev REGION=us-east-1  # applies exactly that plan
 
 # 4. Check it.
-make verify                          # curl the endpoint and print the JSON
-make logs                            # tail the Lambda's CloudWatch logs
+make verify ENV=dev REGION=us-east-1 # curl the endpoint and print the JSON
+make logs ENV=dev REGION=us-east-1   # tail the Lambda's CloudWatch logs
 
 # 5. Tear it down when finished: the NAT gateway and database bill by the hour.
-make destroy ENV=dev CONFIRM=yes
+make destroy ENV=dev REGION=us-east-1 CONFIRM=dev
 ```
+
+Each environment and region has its own state, `info-api/<env>/<region>/terraform.tfstate`.
+If a run is interrupted and the state stays locked, Terraform prints a lock ID:
+`make unlock ENV=dev REGION=us-east-1 CONFIRM=dev LOCK_ID=<id>`.
 
 The first `apply` creates a NAT gateway and an RDS instance, which usually takes
 several minutes (RDS is the slow part). `make apply` refuses to run without a

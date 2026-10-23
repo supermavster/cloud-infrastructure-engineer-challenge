@@ -112,7 +112,7 @@ applies exactly that.
 ## Tearing down
 
 ```bash
-make destroy ENV=dev CONFIRM=yes
+make destroy ENV=dev REGION=us-east-1 CONFIRM=dev
 ```
 
 Terraform still asks for confirmation. Things to know:
@@ -134,7 +134,8 @@ Terraform still asks for confirmation. Things to know:
 
 | Symptom | Cause | Fix |
 | ------- | ----- | --- |
-| `make init` says `backend.hcl` is missing | Step 1 of the deploy not done | `make backend-config ENV=<env>` |
+| `make init` says to set `STATE_BUCKET` | The bootstrap bucket was not created, or was created on another machine | Run `make bootstrap-plan` and `bootstrap-apply`, or set `STATE_BUCKET` and `STATE_REGION` |
+| Terraform says the state is locked | A run was interrupted | `make unlock ENV=<env> REGION=<region> CONFIRM=<env> LOCK_ID=<id from the error>` |
 | Terraform refuses the account | `allowed_account_ids` does not include the active account | Fix the profile or the list |
 | Bucket name already exists | S3 bucket names are global | Choose another `BUCKET` |
 | Apply fails because unreserved concurrency would fall below its minimum | The account's Lambda quota is too small to reserve any | Leave `lambda_reserved_concurrency` at -1 (the dev default) |

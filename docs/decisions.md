@@ -23,8 +23,8 @@ installations.
 
 **Chosen.** `terraform/` is a thin root that wires modules together.
 Per-environment values live in `environments/<env>/terraform.tfvars`, and the
-state location is passed at `init` from a `backend.hcl` file. Variables that
-differ per environment have no default.
+state location is passed at `init` (the bucket, and a key per environment and
+region). Variables that differ per environment have no default.
 
 **Rejected.** Terragrunt, and separate stacks that read each other's state. Both
 add ordering and coupling that a single environment does not need, and a reviewer
