@@ -99,6 +99,20 @@ make function-lint function-test   # from the repository root
 make build                         # packages build/functions/info for the Lambda
 ```
 
+Integration tests run against any PostgreSQL you point them at; without
+`DB_HOST` they are skipped:
+
+```bash
+DB_HOST=127.0.0.1 DB_PORT=5432 DB_NAME=appdb DB_USER=app DB_PASSWORD=<password> \
+DB_SSL_MODE=disable make function-integration
+```
+
+They cover the real driver and queries, the session's statement timeout,
+connection reuse, a wrong password, a closed port and the handler end to end.
+TLS verification against the real RDS certificate can only be exercised once
+deployed; the unit tests check that the SSL context requires a valid
+certificate and hostname.
+
 The package is built from the locked dependencies with hashes, for Linux arm64
 and Python 3.13. All dependencies are pure Python; `boto3` comes from the
 Lambda runtime and is not bundled.

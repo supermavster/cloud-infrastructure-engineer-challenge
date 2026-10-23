@@ -18,12 +18,6 @@ top-level README for the full deployment steps.
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.11, < 2.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.70 |
 
-## Providers
-
-| Name | Version |
-| ---- | ------- |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.70.0 |
-
 ## Modules
 
 | Name | Source | Version |
