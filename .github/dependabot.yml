@@ -18,6 +18,13 @@ updates:
     commit-message:
       prefix: "chore(deps)"
 
+  - package-ecosystem: docker-compose
+    directory: /local
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "chore(deps)"
+
   - package-ecosystem: uv
     directory: /functions/info
     schedule:

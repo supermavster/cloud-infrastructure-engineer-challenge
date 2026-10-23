@@ -15,7 +15,7 @@ FUNCTION_DIR := functions/info
 BUILD_DIR := build/functions/info
 ENV_DIR := terraform/environments/$(ENV)
 
-.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test function-lint function-test function-integration actionlint build check
+.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test function-lint function-test function-integration actionlint local-up local-down local-invoke build check
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -82,6 +82,17 @@ function-test: ## Run the Lambda unit tests (no database needed)
 
 function-integration: ## Run the integration tests against the PostgreSQL in the DB_* variables
 	cd $(FUNCTION_DIR) && uv run pytest -m integration
+
+local-up: ## Start a local PostgreSQL in Docker (creates local/.env from the example)
+	@test -f local/.env || cp local/.env.example local/.env
+	docker compose --env-file local/.env -f local/docker-compose.yml up -d --wait
+
+local-down: ## Stop the local PostgreSQL and discard its data
+	docker compose --env-file local/.env -f local/docker-compose.yml down -v
+
+local-invoke: ## Run the real handler once against the database in local/.env
+	@test -f local/.env || { echo "missing local/.env: run make local-up first"; exit 1; }
+	set -a && . local/.env && set +a && cd $(FUNCTION_DIR) && uv run python scripts/invoke_local.py
 
 build: ## Package the Lambda function into build/ (locked, hash-verified, linux arm64)
 	rm -rf build
