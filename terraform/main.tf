@@ -36,3 +36,23 @@ module "security" {
   vpc_id  = module.network.vpc_id
   db_port = local.db_port
 }
+
+module "database" {
+  source = "./modules/database"
+
+  name                  = local.name_prefix
+  subnet_ids            = module.network.data_subnet_ids
+  security_group_id     = module.security.database_security_group_id
+  kms_key_arn           = module.kms.key_arns["data"]
+  log_kms_key_arn       = module.kms.key_arns["observability"]
+  port                  = local.db_port
+  instance_class        = var.db_instance_class
+  allocated_storage     = var.db_allocated_storage
+  max_allocated_storage = var.db_max_allocated_storage
+  multi_az              = var.db_multi_az
+  backup_retention_days = var.db_backup_retention_days
+  deletion_protection   = var.db_deletion_protection
+  skip_final_snapshot   = var.db_skip_final_snapshot
+  apply_immediately     = var.db_apply_immediately
+  log_retention_days    = var.log_retention_days
+}

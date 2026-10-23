@@ -77,3 +77,54 @@ variable "flow_log_retention_days" {
   description = "Days to keep VPC flow logs."
   type        = number
 }
+
+variable "log_retention_days" {
+  description = "Days to keep CloudWatch log groups other than VPC flow logs."
+  type        = number
+}
+
+variable "db_instance_class" {
+  description = "RDS instance class."
+  type        = string
+  default     = "db.t4g.micro"
+}
+
+variable "db_allocated_storage" {
+  description = "Initial database storage in GiB."
+  type        = number
+  default     = 20
+}
+
+variable "db_max_allocated_storage" {
+  description = "Ceiling in GiB that database storage grows to automatically."
+  type        = number
+  default     = 50
+}
+
+variable "db_multi_az" {
+  description = "Run a synchronous standby in a second zone with automatic failover."
+  type        = bool
+}
+
+variable "db_backup_retention_days" {
+  description = "Days to keep automated database backups (1-35). Sets the point-in-time restore window."
+  type        = number
+}
+
+variable "db_deletion_protection" {
+  description = "Refuse to delete the database while true."
+  type        = bool
+  default     = true
+}
+
+variable "db_skip_final_snapshot" {
+  description = "Skip the snapshot taken when the database is deleted. Leave false anywhere data matters."
+  type        = bool
+  default     = false
+}
+
+variable "db_apply_immediately" {
+  description = "Apply database modifications now instead of in the next maintenance window. Some changes restart the database."
+  type        = bool
+  default     = false
+}

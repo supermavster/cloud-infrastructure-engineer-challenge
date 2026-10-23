@@ -9,5 +9,13 @@ kms_deletion_window_in_days = 7
 nat_gateway_mode        = "single"
 flow_log_retention_days = 7
 
+# Dev is disposable: no standby, and no snapshot or protection to block teardown.
+db_multi_az              = false
+db_backup_retention_days = 7
+db_deletion_protection   = false
+db_skip_final_snapshot   = true
+db_apply_immediately     = true
+log_retention_days       = 7
+
 # Set to your account ID so a wrong AWS profile fails fast:
 # allowed_account_ids = ["<AWS_ACCOUNT_ID>"]
