@@ -45,8 +45,8 @@ Each of these is deliberate, with the way out:
 
 - No secret is committed. gitleaks runs on every commit and scans the whole git
   history in CI.
-- `.tfvars` files hold only non-sensitive settings. State, plans, `backend.hcl`
-  and `.env` files are gitignored.
+- `.tfvars` files hold only non-sensitive settings. State, plans and `.env`
+  files are gitignored.
 - The CI workflow uses a read-only token, no AWS credentials, checkout without
   persisted credentials, and actions pinned to commit SHAs. It runs on
   `pull_request`, so code from a fork never gets secrets.

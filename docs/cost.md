@@ -33,7 +33,7 @@ challenge asks for, so it stays; the other lines are small.
 
 ## Levers
 
-- **Tear it down** when done: `make destroy ENV=dev CONFIRM=yes`.
+- **Tear it down** when done: `make destroy ENV=dev CONFIRM=dev`.
 - **`nat_gateway_mode = "single"`** halves the NAT cost, at the price of one zone
   being a single point of failure for outbound access. Dev already uses it.
 - **Shorter log and backup retention** lowers storage; both are variables.

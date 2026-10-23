@@ -1,10 +1,10 @@
 output "bucket_name" {
-  description = "Name of the state bucket. Goes into backend.hcl as bucket."
+  description = "Name of the state bucket. make init uses it as STATE_BUCKET."
   value       = aws_s3_bucket.state.id
 }
 
 output "region" {
-  description = "Region of the state bucket. Goes into backend.hcl as region."
+  description = "Region of the state bucket. make init uses it as STATE_REGION."
   value       = var.region
 }
 

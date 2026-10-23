@@ -16,8 +16,11 @@ table is needed.
 ```bash
 make bootstrap-plan BUCKET=<globally-unique-name>   # review the plan
 make bootstrap-apply                                # applies the saved plan
-make backend-config ENV=dev                         # writes environments/dev/backend.hcl
 ```
+
+From then on `make init` finds the bucket by itself, from this root's outputs.
+On another machine, or in the GitHub workflow, set `STATE_BUCKET` and
+`STATE_REGION` instead.
 
 Keep `terraform/bootstrap/terraform.tfstate` (gitignored): it is the only record
 of this bucket. Losing it does not delete the bucket, but you would have to
@@ -65,7 +68,7 @@ No modules.
 
 | Name | Description |
 | ---- | ----------- |
-| <a name="output_bucket_name"></a> [bucket\_name](#output\_bucket\_name) | Name of the state bucket. Goes into backend.hcl as bucket. |
+| <a name="output_bucket_name"></a> [bucket\_name](#output\_bucket\_name) | Name of the state bucket. make init uses it as STATE\_BUCKET. |
 | <a name="output_kms_key_arn"></a> [kms\_key\_arn](#output\_kms\_key\_arn) | KMS key that encrypts the state bucket. |
-| <a name="output_region"></a> [region](#output\_region) | Region of the state bucket. Goes into backend.hcl as region. |
+| <a name="output_region"></a> [region](#output\_region) | Region of the state bucket. make init uses it as STATE\_REGION. |
 <!-- END_TF_DOCS -->
