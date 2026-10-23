@@ -128,3 +128,43 @@ variable "db_apply_immediately" {
   type        = bool
   default     = false
 }
+
+variable "lambda_package_dir" {
+  description = "Directory holding the built Lambda package. Created by make build."
+  type        = string
+  default     = "../build/functions/info"
+}
+
+variable "lambda_reserved_concurrency" {
+  description = "Cap on concurrent Lambda executions, which also caps database connections. -1 leaves it unreserved; accounts with a low concurrency quota cannot reserve any."
+  type        = number
+  default     = -1
+}
+
+variable "lambda_timeout_seconds" {
+  description = "Lambda timeout. API Gateway waits one second longer, so callers see the function's own error rather than a gateway timeout."
+  type        = number
+  default     = 15
+}
+
+variable "api_throttling_rate_limit" {
+  description = "Requests per second the API accepts. Excess requests get HTTP 429 before they reach the database."
+  type        = number
+}
+
+variable "api_throttling_burst_limit" {
+  description = "Short burst of requests the API accepts above the steady rate."
+  type        = number
+}
+
+variable "alert_email" {
+  description = "Address that receives alarm notifications. AWS emails a confirmation link that must be clicked. Null creates the topic without a subscriber."
+  type        = string
+  default     = null
+}
+
+variable "db_connections_alarm_threshold" {
+  description = "Database connection count that raises an alarm: about 75% of max_connections. The default of 60 suits db.t4g.micro and must be revisited with the instance class."
+  type        = number
+  default     = 60
+}

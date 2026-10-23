@@ -23,6 +23,11 @@ output "data_subnet_ids" {
   value       = [for az in local.azs : aws_subnet.data[az].id]
 }
 
+output "nat_gateway_ids" {
+  description = "NAT gateway IDs, ordered by availability zone. Used to alarm on port exhaustion."
+  value       = [for az in local.azs : aws_nat_gateway.this[az].id if contains(keys(aws_nat_gateway.this), az)]
+}
+
 output "nat_public_ips" {
   description = "Public IPs that outbound traffic from the application subnets appears to come from."
   value       = [for az, eip in aws_eip.nat : eip.public_ip]

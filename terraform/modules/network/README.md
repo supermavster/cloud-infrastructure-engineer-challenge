@@ -91,6 +91,7 @@ No modules.
 | ---- | ----------- |
 | <a name="output_app_subnet_ids"></a> [app\_subnet\_ids](#output\_app\_subnet\_ids) | Private application subnet IDs (Lambda), ordered by availability zone. |
 | <a name="output_data_subnet_ids"></a> [data\_subnet\_ids](#output\_data\_subnet\_ids) | Isolated data subnet IDs (database), ordered by availability zone. |
+| <a name="output_nat_gateway_ids"></a> [nat\_gateway\_ids](#output\_nat\_gateway\_ids) | NAT gateway IDs, ordered by availability zone. Used to alarm on port exhaustion. |
 | <a name="output_nat_public_ips"></a> [nat\_public\_ips](#output\_nat\_public\_ips) | Public IPs that outbound traffic from the application subnets appears to come from. |
 | <a name="output_public_subnet_ids"></a> [public\_subnet\_ids](#output\_public\_subnet\_ids) | Public subnet IDs, ordered by availability zone. |
 | <a name="output_vpc_cidr_block"></a> [vpc\_cidr\_block](#output\_vpc\_cidr\_block) | CIDR block of the VPC. |
