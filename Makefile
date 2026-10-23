@@ -15,8 +15,9 @@ ACTIONLINT_VERSION := 1.7.12.25
 FUNCTION_DIR := functions/info
 BUILD_DIR := build/functions/info
 ENV_DIR := terraform/environments/$(ENV)
+TFVARS := environments/$(ENV)/terraform.tfvars
 
-.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test function-lint function-test function-integration docs actionlint local-up local-down local-invoke build check
+.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test function-lint function-test function-integration docs actionlint local-up local-down local-invoke build check plan apply destroy verify logs
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -107,5 +108,23 @@ build: ## Package the Lambda function into build/ (locked, hash-verified, linux 
 	uv pip install --quiet --target $(BUILD_DIR) --python-platform aarch64-manylinux2014 --python-version 3.13 --require-hashes --no-deps -r build/requirements.txt
 	cp -R $(FUNCTION_DIR)/src/info_api $(BUILD_DIR)/
 	find $(BUILD_DIR) -name __pycache__ -type d -prune -exec rm -rf {} +
+
+plan: build ## Plan ENV and save the plan to review (needs AWS credentials and make init)
+	@test -d $(ENV_DIR) || { echo "unknown ENV '$(ENV)': $(ENV_DIR) does not exist"; exit 1; }
+	$(TF) plan -input=false -lock-timeout=60s -var-file=$(TFVARS) -out=$(ENV).tfplan
+
+apply: ## Apply the plan saved by make plan, and nothing else
+	@test -f terraform/$(ENV).tfplan || { echo "no saved plan for '$(ENV)': run make plan ENV=$(ENV) and review it first"; exit 1; }
+	$(TF) apply -input=false -lock-timeout=60s $(ENV).tfplan
+
+destroy: build ## Destroy ENV. Needs CONFIRM=yes, and Terraform still asks for confirmation
+	@test "$(CONFIRM)" = yes || { echo "refusing to destroy '$(ENV)': run make destroy ENV=$(ENV) CONFIRM=yes"; exit 1; }
+	$(TF) destroy -lock-timeout=60s -var-file=$(TFVARS)
+
+verify: ## Call the deployed endpoint and print the response
+	curl -sS --fail-with-body "$$($(TF) output -raw info_url)" | jq .
+
+logs: ## Tail the Lambda's CloudWatch logs (needs the AWS CLI)
+	aws logs tail "/aws/lambda/$$($(TF) output -raw lambda_function_name)" --since 15m --follow
 
 check: fmt-check validate lint actionlint scan test function-lint function-test ## Everything that needs no database or AWS account
