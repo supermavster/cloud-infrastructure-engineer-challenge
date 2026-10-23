@@ -14,7 +14,7 @@ FUNCTION_DIR := functions/info
 BUILD_DIR := build/functions/info
 ENV_DIR := terraform/environments/$(ENV)
 
-.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test function-lint function-test build check
+.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test function-lint function-test function-integration build check
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -75,6 +75,9 @@ function-lint: ## Lint and format-check the Lambda function
 
 function-test: ## Run the Lambda unit tests (no database needed)
 	cd $(FUNCTION_DIR) && uv run pytest -m "not integration"
+
+function-integration: ## Run the integration tests against the PostgreSQL in the DB_* variables
+	cd $(FUNCTION_DIR) && uv run pytest -m integration
 
 build: ## Package the Lambda function into build/ (locked, hash-verified, linux arm64)
 	rm -rf build
