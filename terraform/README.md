@@ -32,6 +32,7 @@ top-level README for the full deployment steps.
 | <a name="module_database"></a> [database](#module\_database) | ./modules/database | n/a |
 | <a name="module_kms"></a> [kms](#module\_kms) | ./modules/kms | n/a |
 | <a name="module_lambda"></a> [lambda](#module\_lambda) | ./modules/lambda | n/a |
+| <a name="module_monitoring"></a> [monitoring](#module\_monitoring) | ./modules/monitoring | n/a |
 | <a name="module_network"></a> [network](#module\_network) | ./modules/network | n/a |
 | <a name="module_security"></a> [security](#module\_security) | ./modules/security | n/a |
 
@@ -55,10 +56,12 @@ top-level README for the full deployment steps.
 | <a name="input_nat_gateway_mode"></a> [nat\_gateway\_mode](#input\_nat\_gateway\_mode) | single shares one NAT gateway across zones (cheaper). per\_az gives each zone its own, so one zone failing does not cut egress for the others. | `string` | n/a | yes |
 | <a name="input_owner"></a> [owner](#input\_owner) | Owner tag applied to every resource. | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | AWS region to deploy into, for example us-east-1. | `string` | n/a | yes |
+| <a name="input_alert_email"></a> [alert\_email](#input\_alert\_email) | Address that receives alarm notifications. AWS emails a confirmation link that must be clicked. Null creates the topic without a subscriber. | `string` | `null` | no |
 | <a name="input_allowed_account_ids"></a> [allowed\_account\_ids](#input\_allowed\_account\_ids) | AWS account IDs Terraform may run against. Leave empty to disable the guard. | `list(string)` | `[]` | no |
 | <a name="input_az_count"></a> [az\_count](#input\_az\_count) | Number of availability zones to spread subnets across (2 or 3). | `number` | `2` | no |
 | <a name="input_db_allocated_storage"></a> [db\_allocated\_storage](#input\_db\_allocated\_storage) | Initial database storage in GiB. | `number` | `20` | no |
 | <a name="input_db_apply_immediately"></a> [db\_apply\_immediately](#input\_db\_apply\_immediately) | Apply database modifications now instead of in the next maintenance window. Some changes restart the database. | `bool` | `false` | no |
+| <a name="input_db_connections_alarm_threshold"></a> [db\_connections\_alarm\_threshold](#input\_db\_connections\_alarm\_threshold) | Database connection count that raises an alarm: about 75% of max\_connections. The default of 60 suits db.t4g.micro and must be revisited with the instance class. | `number` | `60` | no |
 | <a name="input_db_deletion_protection"></a> [db\_deletion\_protection](#input\_db\_deletion\_protection) | Refuse to delete the database while true. | `bool` | `true` | no |
 | <a name="input_db_instance_class"></a> [db\_instance\_class](#input\_db\_instance\_class) | RDS instance class. | `string` | `"db.t4g.micro"` | no |
 | <a name="input_db_max_allocated_storage"></a> [db\_max\_allocated\_storage](#input\_db\_max\_allocated\_storage) | Ceiling in GiB that database storage grows to automatically. | `number` | `50` | no |
@@ -75,6 +78,7 @@ top-level README for the full deployment steps.
 | Name | Description |
 | ---- | ----------- |
 | <a name="output_account_id"></a> [account\_id](#output\_account\_id) | AWS account this configuration is applied to. Check it before approving a plan. |
+| <a name="output_alarm_topic_arn"></a> [alarm\_topic\_arn](#output\_alarm\_topic\_arn) | SNS topic that receives every alarm. Subscribe to it, or set alert\_email. |
 | <a name="output_api_access_log_group_name"></a> [api\_access\_log\_group\_name](#output\_api\_access\_log\_group\_name) | CloudWatch log group that receives the API access logs. |
 | <a name="output_database_identifier"></a> [database\_identifier](#output\_database\_identifier) | RDS instance identifier. Use it with the RDS and CloudWatch APIs. |
 | <a name="output_info_url"></a> [info\_url](#output\_info\_url) | URL of GET /info. |

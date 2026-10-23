@@ -59,6 +59,15 @@ run "single_mode_shares_one_nat_gateway" {
   }
 }
 
+run "nat_gateway_ids_are_exposed_for_alarms" {
+  command = plan
+
+  assert {
+    condition     = length(output.nat_gateway_ids) == 1
+    error_message = "Single mode exposes one NAT gateway ID."
+  }
+}
+
 run "per_az_mode_creates_one_nat_gateway_per_zone" {
   command = plan
 

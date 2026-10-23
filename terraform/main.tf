@@ -113,3 +113,19 @@ module "api" {
   log_retention_days     = var.log_retention_days
   log_kms_key_arn        = module.kms.key_arns["observability"]
 }
+
+module "monitoring" {
+  source = "./modules/monitoring"
+
+  name                      = local.name_prefix
+  kms_key_arn               = module.kms.key_arns["observability"]
+  alert_email               = var.alert_email
+  db_instance_identifier    = module.database.identifier
+  db_connections_threshold  = var.db_connections_alarm_threshold
+  lambda_function_name      = module.lambda.function_name
+  lambda_timeout_seconds    = var.lambda_timeout_seconds
+  lambda_log_group_name     = module.lambda.log_group_name
+  api_id                    = module.api.api_id
+  api_access_log_group_name = module.api.access_log_group_name
+  nat_gateway_ids           = module.network.nat_gateway_ids
+}

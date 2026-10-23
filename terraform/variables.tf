@@ -156,3 +156,15 @@ variable "api_throttling_burst_limit" {
   description = "Short burst of requests the API accepts above the steady rate."
   type        = number
 }
+
+variable "alert_email" {
+  description = "Address that receives alarm notifications. AWS emails a confirmation link that must be clicked. Null creates the topic without a subscriber."
+  type        = string
+  default     = null
+}
+
+variable "db_connections_alarm_threshold" {
+  description = "Database connection count that raises an alarm: about 75% of max_connections. The default of 60 suits db.t4g.micro and must be revisited with the instance class."
+  type        = number
+  default     = 60
+}
