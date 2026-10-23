@@ -38,7 +38,7 @@ flowchart LR
 | Terraform tests (mocked AWS, no account needed) | passes: 79 test runs, 71 in the modules and the state bootstrap and 4 root tests for each of dev and prod |
 | Lambda: lint, 44 unit tests, 7 integration tests against PostgreSQL 17 | passes |
 | Local run of the real handler against PostgreSQL 17 | answers 200 with the database details |
-| CI workflow | written and linted; **has not run on GitHub yet** |
+| CI workflow on GitHub | passes: all five jobs (Lambda function, Terraform, Lint, Security, Generated docs), first run on the pull request that added it |
 | **Deployed to AWS, live endpoint and CloudWatch logs** | **not done**: needs an AWS account. See [Deploy](#deploy) |
 
 Everything above the last row is verified without AWS. The live endpoint and the
@@ -232,6 +232,7 @@ saved for the common questions. The alarm table is in
 make check                  # format, validate, tflint, actionlint, checkov, all tests, ruff
 make test                   # Terraform tests only: every module, then the root for dev and prod
 make function-test          # Lambda unit tests
+make docs                   # regenerate the Terraform README tables (needs terraform-docs 0.24.0)
 make local-up && make local-invoke   # run the real handler against a local PostgreSQL 17
 ```
 
