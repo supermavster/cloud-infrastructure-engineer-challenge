@@ -147,3 +147,15 @@ calls the same Makefile targets a developer does.
 **Why.** The checkov package installed on the author's workstation had a broken
 wrapper, and a bare command would also have made results depend on whatever was
 installed. Pinning removes both problems and keeps local and CI results the same.
+
+## 13. Two ways to deploy, one set of commands
+
+**Chosen.** `make` for people who have the tools, and a `workflow_dispatch`
+workflow for people who would rather click. The workflow only calls the make
+targets, so there is one implementation to review and both paths act on the same
+state. It uses OIDC when a role is configured and access keys otherwise, and prod
+waits for a reviewer.
+
+**Costs.** `apply` plans and applies in the same run instead of passing a saved
+plan between jobs, which would need the plan and the packaged function to travel
+together. Run `plan` first to read it before applying.

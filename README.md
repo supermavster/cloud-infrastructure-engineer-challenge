@@ -114,6 +114,11 @@ Each environment and region has its own state, `info-api/<env>/<region>/terrafor
 If a run is interrupted and the state stays locked, Terraform prints a lock ID:
 `make unlock ENV=dev REGION=us-east-1 CONFIRM=dev LOCK_ID=<id>`.
 
+**Prefer the GitHub UI to `make`?** The `deploy` workflow does plan, apply, destroy
+and unlock from the Actions tab, choosing the environment and region, with the
+credentials kept as GitHub secrets. It calls the same targets, so it works on the
+same state. Setup is in [docs/github-actions.md](docs/github-actions.md).
+
 The first `apply` creates a NAT gateway and an RDS instance, which usually takes
 several minutes (RDS is the slow part). `make apply` refuses to run without a
 plan saved by `make plan`, so nothing is applied that was not reviewed.
