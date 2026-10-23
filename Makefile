@@ -4,6 +4,7 @@ SHELL := /usr/bin/env bash
 
 ENV ?= dev
 TF_ROOTS := terraform terraform/bootstrap
+DOC_DIRS := terraform terraform/bootstrap $(wildcard terraform/modules/*)
 TF_TEST_DIRS := terraform/bootstrap $(wildcard terraform/modules/*)
 ENVS := dev prod
 TF := terraform -chdir=terraform
@@ -15,7 +16,7 @@ FUNCTION_DIR := functions/info
 BUILD_DIR := build/functions/info
 ENV_DIR := terraform/environments/$(ENV)
 
-.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test function-lint function-test function-integration actionlint local-up local-down local-invoke build check
+.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test function-lint function-test function-integration docs actionlint local-up local-down local-invoke build check
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -69,6 +70,11 @@ test: ## Run terraform test: every module, then the root once per environment (m
 	@for env in $(ENVS); do \
 		echo "test terraform ($$env)"; \
 		terraform -chdir=terraform test -var-file=environments/$$env/terraform.tfvars; \
+	done
+
+docs: ## Regenerate the Terraform README tables (needs terraform-docs 0.24.0)
+	@for dir in $(DOC_DIRS); do \
+		terraform-docs --config .terraform-docs.yml $$dir >/dev/null; \
 	done
 
 actionlint: ## Lint the GitHub Actions workflows (pinned version, no install needed)

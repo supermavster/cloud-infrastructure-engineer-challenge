@@ -17,6 +17,7 @@ env:
   TERRAFORM_VERSION: "1.15.9"
   TFLINT_VERSION: "v0.64.0"
   GITLEAKS_VERSION: "8.30.1"
+  TERRAFORM_DOCS_VERSION: "0.24.0"
 
 jobs:
   function:
@@ -118,11 +119,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: terraform-docs/gh-actions@6de6da0cefcc6b4b7a5cbea4d79d97060733093c # v1.4.1
-        with:
-          find-dir: terraform
-          config-file: .terraform-docs.yml
-          fail-on-diff: true
-      - name: Show what differs
-        if: failure()
-        run: git --no-pager diff HEAD
+      - name: Install terraform-docs
+        run: |
+          set -euo pipefail
+          base="https://github.com/terraform-docs/terraform-docs/releases/download/v${TERRAFORM_DOCS_VERSION}"
+          archive="terraform-docs-v${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz"
+          curl -fsSL -o "${archive}" "${base}/${archive}"
+          curl -fsSL -o checksums.txt "${base}/terraform-docs-v${TERRAFORM_DOCS_VERSION}.sha256sum"
+          grep " ${archive}$" checksums.txt | sha256sum -c -
+          mkdir -p "${RUNNER_TEMP}/bin"
+          tar -xzf "${archive}" -C "${RUNNER_TEMP}/bin" terraform-docs
+          echo "${RUNNER_TEMP}/bin" >> "${GITHUB_PATH}"
+      - run: make docs
+      - name: Fail if a generated README is out of date
+        run: git --no-pager diff --exit-code
