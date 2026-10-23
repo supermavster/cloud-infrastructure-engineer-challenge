@@ -10,11 +10,12 @@ TF := terraform -chdir=terraform
 BOOTSTRAP := terraform -chdir=terraform/bootstrap
 REGION ?= us-east-1
 CHECKOV_VERSION := 3.3.30
+ACTIONLINT_VERSION := 1.7.12.25
 FUNCTION_DIR := functions/info
 BUILD_DIR := build/functions/info
 ENV_DIR := terraform/environments/$(ENV)
 
-.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test function-lint function-test function-integration build check
+.PHONY: help bootstrap-plan bootstrap-apply backend-config init fmt fmt-check validate lint scan test function-lint function-test function-integration actionlint build check
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -70,6 +71,9 @@ test: ## Run terraform test: every module, then the root once per environment (m
 		terraform -chdir=terraform test -var-file=environments/$$env/terraform.tfvars; \
 	done
 
+actionlint: ## Lint the GitHub Actions workflows (pinned version, no install needed)
+	uvx --from actionlint-py==$(ACTIONLINT_VERSION) actionlint
+
 function-lint: ## Lint and format-check the Lambda function
 	cd $(FUNCTION_DIR) && uv run ruff check . && uv run ruff format --check .
 
@@ -87,4 +91,4 @@ build: ## Package the Lambda function into build/ (locked, hash-verified, linux 
 	cp -R $(FUNCTION_DIR)/src/info_api $(BUILD_DIR)/
 	find $(BUILD_DIR) -name __pycache__ -type d -prune -exec rm -rf {} +
 
-check: fmt-check validate lint scan test function-lint function-test ## Everything that needs no database or AWS account
+check: fmt-check validate lint actionlint scan test function-lint function-test ## Everything that needs no database or AWS account
