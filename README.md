@@ -81,6 +81,10 @@ behaviour are listed in [Not verified](#not-verified).
 
 ## Deploy
 
+First time, or handing this to someone else? [docs/runbook.md](docs/runbook.md) goes
+from getting AWS credentials to a working endpoint and back to an empty account,
+with both `make` and the GitHub workflow. What follows is the short version.
+
 You need an AWS account you can create resources in. Nothing here uses the VPN or
 any other organisation's infrastructure.
 
