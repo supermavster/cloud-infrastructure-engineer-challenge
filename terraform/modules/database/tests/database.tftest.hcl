@@ -90,6 +90,15 @@ run "tls_is_enforced_by_the_parameter_group" {
   }
 }
 
+run "tls_setting_matches_what_rds_reports" {
+  command = plan
+
+  assert {
+    condition     = { for p in aws_db_parameter_group.this.parameter : p.name => p.apply_method }["rds.force_ssl"] == "pending-reboot"
+    error_message = "RDS reports rds.force_ssl as pending-reboot; any other method makes every plan show a change."
+  }
+}
+
 run "logs_go_to_encrypted_groups_that_exist_first" {
   command = plan
 
