@@ -182,9 +182,10 @@ resource "aws_cloudwatch_query_definition" "api_latency" {
   name            = "${var.name}/api-latency-percentiles"
   log_group_names = [var.api_access_log_group_name]
 
+  # jsonencode quotes $context.responseLatency as a string; parse extracts a number for avg/pct.
   query_string = <<-EOT
-    fields responseLatency, status
-    | stats count() as requests, avg(responseLatency) as avg_ms, pct(responseLatency, 99) as p99_ms by bin(5m)
+    parse responseLatency /^(?<latency_ms>\d+)$/
+    | stats count() as requests, avg(latency_ms) as avg_ms, pct(latency_ms, 99) as p99_ms by bin(5m)
     | sort @timestamp desc
   EOT
 }
