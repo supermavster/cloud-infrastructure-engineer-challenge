@@ -14,10 +14,11 @@ resource "aws_db_parameter_group" "this" {
   family      = "postgres${var.postgres_major_version}"
   description = "Parameters for ${local.identifier}"
 
+  # RDS reports this parameter as pending-reboot; declaring "immediate" shows a diff on every plan.
   parameter {
     name         = "rds.force_ssl"
     value        = "1"
-    apply_method = "immediate"
+    apply_method = "pending-reboot"
   }
 
   parameter {
