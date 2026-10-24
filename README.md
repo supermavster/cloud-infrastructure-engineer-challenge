@@ -39,12 +39,12 @@ flowchart LR
 | Lambda: lint, 44 unit tests, 7 integration tests against PostgreSQL 17 | passes |
 | Local run of the real handler against PostgreSQL 17 | answers 200 with the database details |
 | CI workflow on GitHub | passes: all five jobs (Lambda function, Terraform, Lint, Security, Generated docs), first run on the pull request that added it |
-| **Deployed to AWS, live endpoint and CloudWatch logs** | **not done**: needs an AWS account. See [Deploy](#deploy) |
+| **Deployed to AWS, live endpoint and CloudWatch logs** | **verified**: 68 resources applied, `GET /info` answered 200 on cold and warm calls (`52.4 ms` -> `1.6 ms`), logs and saved queries verified in CloudWatch, then destroyed from the workflow. Evidence: [docs/evidence/dev-us-east-1.md](docs/evidence/dev-us-east-1.md) |
 
-Everything above the last row is verified without AWS. The live endpoint and the
-CloudWatch logs (two deliverables) can only be shown by deploying; the steps and
-a short-lived deployment's cost are below. Details that depend on real AWS
-behaviour are listed in [Not verified](#not-verified).
+Everything above the last row is verified without AWS. The live deployment was
+run in `us-east-1` and then torn down so the NAT gateway and the database do not
+keep billing; the steps and a short-lived deployment's cost are below. Details
+that were not exercised in that run are listed in [Not verified](#not-verified).
 
 ## What it deploys
 
@@ -258,14 +258,19 @@ slower ones run before a PR with `pre-commit run --all-files --hook-stage manual
 
 ## Not verified
 
-These depend on real AWS behaviour and need a deployment to confirm:
+The `dev` deployment ([docs/evidence/dev-us-east-1.md](docs/evidence/dev-us-east-1.md))
+confirmed the live endpoint, cold and warm connection reuse, TLS verification
+against a real RDS certificate, the `$default` stage invoke permission, all four
+encrypted log groups (Lambda, API access, RDS PostgreSQL, VPC Flow Logs), the
+three saved Logs Insights queries, and the workflow's `plan` and `destroy`
+actions through OIDC. These remain unexercised:
 
-- The endpoint answering and the logs appearing in CloudWatch.
-- TLS verification against a real RDS certificate.
-- The invoke permission's source ARN format for the `$default` stage.
-- Whether the saved Logs Insights queries match the field names of Lambda's JSON
-  logs.
-- That alarms can publish to the encrypted topic (the key policy allows it).
+- Creating the state bucket through `terraform/bootstrap` (the run reused an
+  existing S3 bucket via `STATE_BUCKET`).
+- That alarms can publish to the encrypted topic when a threshold is breached
+  (all 9 alarms stayed in `OK`).
+- The workflow's `apply` and `unlock` actions, its access-key path, `prod`, and
+  regions other than `us-east-1`.
 - Prices in [docs/cost.md](docs/cost.md), which are approximate.
 
 ## Limitations
