@@ -169,6 +169,11 @@ run "saved_queries_search_the_right_log_groups" {
     )
     error_message = "Function queries search the function log group; the latency query searches the API access log group."
   }
+
+  assert {
+    condition     = can(regex("parse responseLatency", aws_cloudwatch_query_definition.api_latency.query_string))
+    error_message = "responseLatency is logged as a JSON string, so the query must parse it as a number before avg/pct."
+  }
 }
 
 run "rejects_a_malformed_email" {
