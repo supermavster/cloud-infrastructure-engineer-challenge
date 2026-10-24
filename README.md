@@ -35,7 +35,7 @@ flowchart LR
 | What | State |
 | ---- | ----- |
 | Terraform: format, validate, tflint, checkov | passes, run by `make check` |
-| Terraform tests (mocked AWS, no account needed) | passes: 79 test runs, 71 in the modules and the state bootstrap and 4 root tests for each of dev and prod |
+| Terraform tests (mocked AWS, no account needed) | passes: 80 test runs, 72 in the modules and the state bootstrap and 4 root tests for each of dev and prod |
 | Lambda: lint, 44 unit tests, 7 integration tests against PostgreSQL 17 | passes |
 | Local run of the real handler against PostgreSQL 17 | answers 200 with the database details |
 | CI workflow on GitHub | passes: all five jobs (Lambda function, Terraform, Lint, Security, Generated docs), first run on the pull request that added it |
