@@ -85,12 +85,12 @@ run "the_environment_deploys_one_consistent_stack" {
   command = apply
 
   assert {
-    condition     = output.database_identifier == "info-api-${var.environment}-db"
+    condition     = output.database_identifier == "info-api-extended-${var.environment}-db"
     error_message = "Resource names must carry the project and environment."
   }
 
   assert {
-    condition     = output.lambda_function_name == "info-api-${var.environment}-info"
+    condition     = output.lambda_function_name == "info-api-extended-${var.environment}-info"
     error_message = "The function name must carry the project and environment."
   }
 

@@ -33,7 +33,7 @@ variable "tags" {
   description = "Tags applied to every resource."
   type        = map(string)
   default = {
-    Project   = "info-api"
+    Project   = "info-api-extended"
     ManagedBy = "terraform"
   }
 }

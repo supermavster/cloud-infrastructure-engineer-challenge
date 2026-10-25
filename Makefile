@@ -52,7 +52,7 @@ check-plan:
 init: check-env check-state ## Connect to the shared state for ENV and REGION
 	$(TF) init -input=false -reconfigure \
 		-backend-config="bucket=$(STATE_BUCKET)" \
-		-backend-config="key=info-api/$(ENV)/$(REGION)/terraform.tfstate" \
+		-backend-config="key=info-api-extended/$(ENV)/$(REGION)/terraform.tfstate" \
 		-backend-config="region=$(STATE_REGION)" \
 		-backend-config="use_lockfile=true" \
 		$(if $(STATE_KMS_KEY_ID),-backend-config="kms_key_id=$(STATE_KMS_KEY_ID)")

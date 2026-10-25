@@ -305,8 +305,8 @@ information is in the README. A `503` right after an apply usually means the
 database was still starting: wait a minute and retry.
 
 Logs: path A has `make logs`. Otherwise, in the CloudWatch console open Logs > Log
-groups and find `/aws/lambda/info-api-dev-info`, or run
-`aws logs tail /aws/lambda/info-api-dev-info --since 15m --region us-east-1`.
+groups and find `/aws/lambda/info-api-extended-dev-info`, or run
+`aws logs tail /aws/lambda/info-api-extended-dev-info --since 15m --region us-east-1`.
 Each request logs one JSON line with its `request_id`.
 
 ## 7. Tear it down and clean up
