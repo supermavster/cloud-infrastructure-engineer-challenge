@@ -1,7 +1,7 @@
 variable "project" {
   description = "Short project name used as the prefix of every resource name."
   type        = string
-  default     = "info-api"
+  default     = "info-api-extended"
 
   validation {
     condition     = can(regex("^[a-z][a-z0-9-]{1,19}$", var.project))

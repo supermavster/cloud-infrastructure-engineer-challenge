@@ -62,7 +62,7 @@ No modules.
 | <a name="input_bucket_name"></a> [bucket\_name](#input\_bucket\_name) | Globally unique name of the Terraform state bucket. | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | AWS region for the state bucket, for example us-east-1. | `string` | n/a | yes |
 | <a name="input_noncurrent_version_retention_days"></a> [noncurrent\_version\_retention\_days](#input\_noncurrent\_version\_retention\_days) | Days to keep superseded state versions before they are deleted. | `number` | `90` | no |
-| <a name="input_tags"></a> [tags](#input\_tags) | Tags applied to every resource. | `map(string)` | <pre>{<br/>  "ManagedBy": "terraform",<br/>  "Project": "info-api"<br/>}</pre> | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags applied to every resource. | `map(string)` | <pre>{<br/>  "ManagedBy": "terraform",<br/>  "Project": "info-api-extended"<br/>}</pre> | no |
 
 ## Outputs
 

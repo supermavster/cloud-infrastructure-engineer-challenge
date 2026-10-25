@@ -114,7 +114,7 @@ make logs ENV=dev REGION=us-east-1   # tail the Lambda's CloudWatch logs
 make destroy ENV=dev REGION=us-east-1 CONFIRM=dev
 ```
 
-Each environment and region has its own state, `info-api/<env>/<region>/terraform.tfstate`.
+Each environment and region has its own state, `info-api-extended/<env>/<region>/terraform.tfstate`.
 If a run is interrupted and the state stays locked, Terraform prints a lock ID:
 `make unlock ENV=dev REGION=us-east-1 CONFIRM=dev LOCK_ID=<id>`.
 
