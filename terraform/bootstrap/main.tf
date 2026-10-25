@@ -1,3 +1,22 @@
+terraform {
+  required_version = ">= 1.11, < 2.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.70"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.region
+
+  default_tags {
+    tags = var.tags
+  }
+}
+
 data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "kms" {
