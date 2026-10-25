@@ -256,6 +256,13 @@ failed the first real deployment.
 Pre-commit runs the fast checks on every commit (`pre-commit install`). The
 slower ones run before a PR with `pre-commit run --all-files --hook-stage manual`.
 
+For local database testing without an AWS account, `make local-up` starts a
+disposable PostgreSQL 17 container (`local/docker-compose.yml`, listening on
+`127.0.0.1:5432` with data in `tmpfs` and `local/.env` copied from
+`local/.env.example`), `make local-invoke` runs the real handler against it,
+`set -a; . local/.env; set +a; make function-integration` runs the integration
+suite, and `make local-down` tears it down.
+
 ## Not verified
 
 The `dev` deployment ([docs/evidence/dev-us-east-1.md](docs/evidence/dev-us-east-1.md))

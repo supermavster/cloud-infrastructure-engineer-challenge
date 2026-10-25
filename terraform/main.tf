@@ -1,3 +1,42 @@
+terraform {
+  required_version = ">= 1.11, < 2.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.70"
+    }
+  }
+
+  # Bucket, key and region are supplied at init time (make init, or the deploy
+  # workflow), so this code holds no account-specific value.
+  backend "s3" {}
+}
+
+provider "aws" {
+  region = var.region
+
+  # Refuses to run against any account that is not listed. Empty means no guard.
+  allowed_account_ids = length(var.allowed_account_ids) > 0 ? var.allowed_account_ids : null
+
+  default_tags {
+    tags = local.tags
+  }
+}
+
+locals {
+  name_prefix = "${var.project}-${var.environment}"
+  db_port     = 5432
+
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+    ManagedBy   = "terraform"
+    Repository  = "cloud-infrastructure-engineer-challenge"
+    Owner       = var.owner
+  }
+}
+
 data "aws_caller_identity" "current" {}
 
 module "kms" {
