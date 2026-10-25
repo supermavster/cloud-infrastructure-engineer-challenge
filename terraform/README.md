@@ -63,7 +63,7 @@ top-level README for the full deployment steps.
 | <a name="input_kms_deletion_window_in_days"></a> [kms\_deletion\_window\_in\_days](#input\_kms\_deletion\_window\_in\_days) | Days a KMS key stays recoverable after deletion is scheduled (7-30). | `number` | `30` | no |
 | <a name="input_lambda_package_dir"></a> [lambda\_package\_dir](#input\_lambda\_package\_dir) | Directory holding the built Lambda package. Created by make build. | `string` | `"../build/functions/info"` | no |
 | <a name="input_lambda_reserved_concurrency"></a> [lambda\_reserved\_concurrency](#input\_lambda\_reserved\_concurrency) | Cap on concurrent Lambda executions, which also caps database connections. -1 leaves it unreserved; accounts with a low concurrency quota cannot reserve any. | `number` | `-1` | no |
-| <a name="input_lambda_timeout_seconds"></a> [lambda\_timeout\_seconds](#input\_lambda\_timeout\_seconds) | Lambda timeout. API Gateway waits one second longer, so callers see the function's own error rather than a gateway timeout. | `number` | `15` | no |
+| <a name="input_lambda_timeout_seconds"></a> [lambda\_timeout\_seconds](#input\_lambda\_timeout\_seconds) | Lambda timeout (3-29 seconds). API Gateway waits one second longer, so callers see the function's own error rather than a gateway timeout. | `number` | `15` | no |
 | <a name="input_project"></a> [project](#input\_project) | Short project name used as the prefix of every resource name. | `string` | `"info-api"` | no |
 | <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | IPv4 CIDR of the VPC. Subnets are /24 blocks carved from it, so use /16 or larger. | `string` | `"10.20.0.0/16"` | no |
 
