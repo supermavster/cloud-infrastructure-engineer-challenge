@@ -18,7 +18,7 @@ A STRIDE pass over the request path.
 | **Information disclosure** at rest | Database, backups, secret, logs and alert topic encrypted with customer-managed rotating keys; the state bucket is encrypted and blocks public access | RDS enhanced monitoring writes to a log group RDS creates, with default encryption |
 | **Information disclosure** of the password | Generated and rotated by RDS; never in code, variables or Terraform state; excluded from `repr` and logs | The function uses the master user, so a stolen credential is powerful (see below) |
 | **Denial of service** | Stage throttle, Lambda concurrency cap (prod), short timeouts, connection arithmetic in [architecture.md](architecture.md#capacity-and-timeouts), alarms on throttles, 5xx and connections | No WAF; a large flood still bills Lambda and NAT traffic |
-| **Elevation of privilege** | Role limited to one secret, one key (only via Secrets Manager), one database and its own log group; the database accepts one security group on one port; no IAM users or static keys anywhere | The network interface actions need `*` because AWS offers no narrower scope |
+| **Elevation of privilege** | Role limited to one secret, one key (only via Secrets Manager), one database and its own log group; the database accepts one security group on one port; no IAM users or static keys in the deployed application stack | The network interface actions need `*` because AWS offers no narrower scope |
 
 ## Accepted risks
 

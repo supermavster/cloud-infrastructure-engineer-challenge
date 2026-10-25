@@ -113,14 +113,11 @@ export GH_REPO=<OWNER>/<REPO>
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 
 # GitHub's subject prefix for this repository. Repositories created after
-# 15 July 2026 use immutable IDs in it (repo:OWNER@ID/REPO@ID), so do not type it.
-# Fall back to constructing the immutable prefix from the owner and repo IDs if the
-# OIDC customization endpoint is unavailable (pre-July 2026 repos that have not
-# opted in use repo:${GH_REPO} instead).
-SUB_PREFIX=$(gh api "repos/${GH_REPO}/actions/oidc/customization/sub" --jq '.sub_claim_prefix // empty' 2>/dev/null || true)
-if [ -z "$SUB_PREFIX" ]; then
-  SUB_PREFIX=$(gh api "repos/${GH_REPO}" --jq '"repo:\(.owner.login)@\(.owner.id)/\(.name)@\(.id)"')
-fi
+# 15 July 2026 use immutable IDs in it (repo:OWNER@ID/REPO@ID), while older
+# repositories that have not opted in use repo:OWNER/REPO. Query the API, or
+# export SUB_PREFIX explicitly before running if the endpoint is unavailable.
+SUB_PREFIX=${SUB_PREFIX:-$(gh api "repos/${GH_REPO}/actions/oidc/customization/sub" --jq '.sub_claim_prefix // empty' 2>/dev/null || true)}
+test -n "$SUB_PREFIX" || { echo "could not read sub_claim_prefix; export SUB_PREFIX=<repo:... prefix> and rerun"; exit 1; }
 echo "$SUB_PREFIX"
 
 # Once per account. "EntityAlreadyExists" means it is already there: carry on.
@@ -259,6 +256,7 @@ the machine where you ran the bootstrap:
 
 ```bash
 terraform -chdir=terraform/bootstrap output -raw bucket_name | gh secret set STATE_BUCKET
+terraform -chdir=terraform/bootstrap output -raw kms_key_arn | gh secret set STATE_KMS_KEY_ID
 gh variable set STATE_REGION --body "$(terraform -chdir=terraform/bootstrap output -raw region)"
 ```
 

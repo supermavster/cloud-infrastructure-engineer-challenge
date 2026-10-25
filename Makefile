@@ -14,6 +14,7 @@ REGION ?= us-east-1
 # workflow sets STATE_BUCKET and STATE_REGION explicitly.
 STATE_BUCKET ?= $(shell $(BOOTSTRAP) output -raw bucket_name 2>/dev/null)
 STATE_REGION ?= $(or $(shell $(BOOTSTRAP) output -raw region 2>/dev/null),us-east-1)
+STATE_KMS_KEY_ID ?= $(shell $(BOOTSTRAP) output -raw kms_key_arn 2>/dev/null)
 PLAN_FLAGS ?=
 LOCK_ID ?=
 CONFIRM ?=
@@ -54,7 +55,7 @@ init: check-env check-state ## Connect to the shared state for ENV and REGION
 		-backend-config="key=info-api/$(ENV)/$(REGION)/terraform.tfstate" \
 		-backend-config="region=$(STATE_REGION)" \
 		-backend-config="use_lockfile=true" \
-		-backend-config="encrypt=true"
+		$(if $(STATE_KMS_KEY_ID),-backend-config="kms_key_id=$(STATE_KMS_KEY_ID)")
 
 unlock: check-env ## Release a stuck state lock. Needs LOCK_ID and CONFIRM=<ENV>
 	@test -n "$(LOCK_ID)" || { echo "set LOCK_ID to the ID in the 'state is locked' error"; exit 1; }

@@ -142,9 +142,14 @@ variable "lambda_reserved_concurrency" {
 }
 
 variable "lambda_timeout_seconds" {
-  description = "Lambda timeout. API Gateway waits one second longer, so callers see the function's own error rather than a gateway timeout."
+  description = "Lambda timeout (3-29 seconds). API Gateway waits one second longer, so callers see the function's own error rather than a gateway timeout."
   type        = number
   default     = 15
+
+  validation {
+    condition     = var.lambda_timeout_seconds >= 3 && var.lambda_timeout_seconds <= 29
+    error_message = "lambda_timeout_seconds must be between 3 and 29 seconds so integration_timeout_ms stays within API Gateway HTTP API's 30000 ms limit."
+  }
 }
 
 variable "api_throttling_rate_limit" {

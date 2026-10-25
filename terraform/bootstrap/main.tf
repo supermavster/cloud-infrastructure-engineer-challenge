@@ -120,6 +120,30 @@ data "aws_iam_policy_document" "state" {
       values   = ["false"]
     }
   }
+
+  statement {
+    sid       = "DenyNonKmsEncryption"
+    effect    = "Deny"
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.state.arn}/*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "Null"
+      variable = "s3:x-amz-server-side-encryption"
+      values   = ["false"]
+    }
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:x-amz-server-side-encryption"
+      values   = ["aws:kms"]
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "state" {

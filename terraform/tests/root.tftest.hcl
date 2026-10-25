@@ -133,3 +133,13 @@ run "a_malformed_account_id_is_rejected" {
 
   expect_failures = [var.allowed_account_ids]
 }
+
+run "a_lambda_timeout_over_29_seconds_is_rejected" {
+  command = plan
+
+  variables {
+    lambda_timeout_seconds = 30
+  }
+
+  expect_failures = [var.lambda_timeout_seconds]
+}

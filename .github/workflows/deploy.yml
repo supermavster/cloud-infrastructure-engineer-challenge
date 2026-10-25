@@ -60,6 +60,7 @@ jobs:
       CONFIRM: ${{ inputs.confirm }}
       LOCK_ID: ${{ inputs.lock_id }}
       STATE_BUCKET: ${{ secrets.STATE_BUCKET }}
+      STATE_KMS_KEY_ID: ${{ secrets.STATE_KMS_KEY_ID }}
       # Not named AWS_ROLE_ARN: the AWS SDK reads that name. A secret cannot be tested in an if, an env var can.
       DEPLOY_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
       STATE_REGION: ${{ vars.STATE_REGION || 'us-east-1' }}

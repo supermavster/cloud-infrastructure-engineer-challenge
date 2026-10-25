@@ -37,8 +37,10 @@ aws logs tail <log-group> --since 1h --filter-pattern '"database unavailable"'
 
 Three queries are saved in CloudWatch Logs Insights under `<project>-<env>/`:
 recent warnings and errors, database failures by category, and API latency
-percentiles. They have been checked for syntax only; if one returns nothing,
-check the field names against a real log line.
+percentiles. All three were executed against real CloudWatch logs during the
+`dev` deployment ([evidence/dev-us-east-1.md](evidence/dev-us-east-1.md)), with
+`api-latency-percentiles` returning `requests`, `avg_ms` and `p99_ms` (and the
+two error queries returning `0` rows on the healthy stack).
 
 ## Alarms
 
